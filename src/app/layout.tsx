@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import Image from "next/image";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
@@ -29,14 +25,23 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-              <a href="/" className="text-xl font-bold text-primary tracking-tight">
-                Dosific
+              <a href="/" className="flex items-center gap-2.5">
+                <Image
+                  src="/logo.png"
+                  alt="Dosific"
+                  width={32}
+                  height={32}
+                  className="size-8"
+                />
+                <span className="text-xl font-bold text-primary tracking-tight">
+                  Dosific
+                </span>
               </a>
               <ThemeToggle />
             </div>
