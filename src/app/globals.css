@@ -109,21 +109,70 @@
 
 .bg-grid {
   background-image:
-    linear-gradient(to right, #E2E8F0 1px, transparent 1px),
-    linear-gradient(to bottom, #E2E8F0 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 95%);
 }
 
 .dark .bg-grid {
   background-image:
-    linear-gradient(to right, #1E293B 1px, transparent 1px),
-    linear-gradient(to bottom, #1E293B 1px, transparent 1px);
+    linear-gradient(to right, var(--border) 0.5px, transparent 0.5px),
+    linear-gradient(to bottom, var(--border) 0.5px, transparent 0.5px);
+}
+
+/* Glassmorphism card utility */
+.glass-card {
+  background: rgba(var(--card-rgb, 255, 255, 255), 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--foreground-rgb, 15, 23, 42), 0.05);
+}
+
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.45);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Glow effects */
+.glow-best {
+  position: relative;
+}
+.glow-best::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.4) 0%, rgba(52, 211, 153, 0.1) 50%, rgba(16, 185, 129, 0.4) 100%);
+  z-index: -1;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+.glow-best:hover::after {
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.3));
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
 }
 
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -132,11 +181,12 @@
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.4s ease-out both;
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.animate-fade-in-up:nth-child(2) { animation-delay: 0.05s; }
-.animate-fade-in-up:nth-child(3) { animation-delay: 0.1s; }
-.animate-fade-in-up:nth-child(4) { animation-delay: 0.15s; }
-.animate-fade-in-up:nth-child(5) { animation-delay: 0.2s; }
-.animate-fade-in-up:nth-child(6) { animation-delay: 0.25s; }
+.animate-fade-in-up:nth-child(2) { animation-delay: 0.06s; }
+.animate-fade-in-up:nth-child(3) { animation-delay: 0.12s; }
+.animate-fade-in-up:nth-child(4) { animation-delay: 0.18s; }
+.animate-fade-in-up:nth-child(5) { animation-delay: 0.24s; }
+.animate-fade-in-up:nth-child(6) { animation-delay: 0.3s; }
+
