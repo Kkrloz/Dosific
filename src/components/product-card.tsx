@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDoses } from "@/lib/utils";
 import { calculate } from "@/lib/calculator";
+import { Package, TrendingUp } from "lucide-react";
 
 interface ProductCardProps {
   id: string;
@@ -32,11 +33,16 @@ export function ProductCard({
   if (!lastPrice) {
     return (
       <Link href={`/products/${id}`}>
-        <Card className="p-4 hover:shadow-md transition-shadow h-full flex flex-col">
-          <div className="flex items-start justify-between mb-2">
-            <div>
-              <h3 className="font-semibold text-primary">{name}</h3>
-              <p className="text-xs text-muted-foreground">{categoryName}</p>
+        <Card className="p-5 hover:shadow-lg transition-all duration-200 h-full flex flex-col group hover:-translate-y-0.5">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="size-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+              <Package className="size-5 text-muted-foreground" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-semibold text-primary truncate">{name}</h3>
+              <span className="inline-block text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full mt-1">
+                {categoryName}
+              </span>
             </div>
           </div>
           <p className="text-sm text-muted-foreground mt-auto">Sem preço cadastrado</p>
@@ -49,25 +55,33 @@ export function ProductCard({
 
   return (
     <Link href={`/products/${id}`}>
-      <Card className={`p-4 hover:shadow-md transition-shadow h-full flex flex-col relative ${isBest ? "ring-2 ring-accent" : ""}`}>
+      <Card className={`p-5 hover:shadow-lg transition-all duration-200 h-full flex flex-col group hover:-translate-y-0.5 relative ${isBest ? "ring-2 ring-accent" : ""}`}>
         {isBest && (
-          <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground text-xs">
+          <Badge className="absolute -top-2.5 right-3 bg-accent text-accent-foreground text-xs px-2.5 py-0.5 shadow-sm">
             Melhor custo/dose
           </Badge>
         )}
-        <div className="flex items-start justify-between mb-2">
-          <div>
-            <h3 className="font-semibold text-primary">{name}</h3>
-            <p className="text-xs text-muted-foreground">{categoryName}</p>
+        <div className="flex items-start gap-3 mb-3">
+          <div className="size-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/15 transition-colors">
+            <TrendingUp className="size-5 text-accent" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-primary truncate">{name}</h3>
+            <span className="inline-block text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full mt-1">
+              {categoryName}
+            </span>
           </div>
         </div>
-        <div className="mt-auto space-y-1">
-          <p className="text-sm text-muted-foreground">
-            {formatCurrency(lastPrice)} · {packageWeight}{unit}
-          </p>
-          <p className="text-lg font-bold text-accent">
+        <div className="flex items-baseline gap-1 mb-1">
+          <span className="text-2xl font-bold text-accent tracking-tight">
             {formatCurrency(calc.costPerDose)}
-            <span className="text-xs font-normal text-muted-foreground"> /dose</span>
+          </span>
+          <span className="text-xs text-muted-foreground">/dose</span>
+        </div>
+        <div className="mt-auto pt-2 space-y-1">
+          <p className="text-xs text-muted-foreground">
+            {formatCurrency(lastPrice)} · {packageWeight}{unit}
+            {bonus ? <span className="text-accent"> +{bonus}g bônus</span> : ""}
           </p>
           <p className="text-xs text-muted-foreground">
             {formatDoses(calc.totalDoses)} doses · {doseSize}{doseUnit} cada
