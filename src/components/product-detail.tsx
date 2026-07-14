@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { PriceChart } from "@/components/price-chart";
 import { updatePrice } from "@/lib/actions";
+import { ShareButton } from "./share-button";
 import { calculate } from "@/lib/calculator";
 import { formatCurrency, formatDoses } from "@/lib/utils";
 import {
@@ -23,6 +24,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Calendar,
+  ExternalLink,
+  ShoppingCart,
+  Share2,
 } from "lucide-react";
 
 
@@ -44,6 +48,8 @@ interface ProductWithPrices {
   lastPrice: number | null;
   prices: PricePoint[];
   createdAt: Date;
+  url?: string | null;
+  affiliateLink?: string | null;
 }
 
 interface ProductDetailProps {
@@ -86,6 +92,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
       ? product.prices[product.prices.length - 1].price -
         product.prices[0].price
       : null;
+
+  const buyLink = product.url;
 
   const kpis = [
     {
@@ -138,11 +146,26 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <div className="size-12 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0 ring-1 ring-emerald-500/15">
                 <BarChart3 className="size-6 text-emerald-500" />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <h1 className="text-2xl font-bold text-primary tracking-tight">{product.name}</h1>
                 <span className="inline-block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full mt-1.5 uppercase tracking-wider">
                   {product.category.name}
                 </span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <ShareButton productId={product.id} productName={product.name} />
+                {buyLink && (
+                  <a
+                    href={`/api/click/${product.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3.5 py-2 rounded-full shadow-sm hover:shadow-md transition-all"
+                  >
+                    <ShoppingCart className="size-3.5" />
+                    Comprar
+                    <ExternalLink className="size-3" />
+                  </a>
+                )}
               </div>
             </div>
 
@@ -188,6 +211,14 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <p>Peso total: <strong className="text-primary font-semibold">{product.packageWeight}{product.unit}{product.bonus ? ` (+${product.bonus}g bônus)` : ""}</strong></p>
               <p>Registros de preço: <strong className="text-primary font-semibold">{product.prices.length}</strong></p>
               <p className="col-span-2">Cadastrado em: <strong className="text-primary font-semibold">{new Date(product.createdAt).toLocaleDateString("pt-BR", { day: 'numeric', month: 'long', year: 'numeric' })}</strong></p>
+              {product.url && (
+                <p className="col-span-2 truncate">
+                  URL original:{' '}
+                  <a href={product.url} target="_blank" rel="noopener noreferrer nofollow" className="text-emerald-500 hover:underline font-medium">
+                    {product.url}
+                  </a>
+                </p>
+              )}
             </div>
           </Card>
 

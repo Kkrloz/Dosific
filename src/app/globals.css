@@ -48,51 +48,51 @@
 }
 
 :root {
-  --background: #F8FAFC;
-  --foreground: #0F172A;
+  --background: #F9F9F9;
+  --foreground: #0F0F0F;
   --card: #FFFFFF;
-  --card-foreground: #0F172A;
+  --card-foreground: #0F0F0F;
   --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
-  --primary: #0F172A;
-  --primary-foreground: #F8FAFC;
-  --secondary: #475569;
-  --secondary-foreground: #F8FAFC;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
+  --popover-foreground: #0F0F0F;
+  --primary: #0F0F0F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #606060;
+  --secondary-foreground: #FFFFFF;
+  --muted: #F1F1F1;
+  --muted-foreground: #606060;
   --accent: #10B981;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #10B981;
+  --border: #E5E5E5;
+  --input: #E5E5E5;
+  --ring: #0F0F0F;
   --chart-1: #10B981;
-  --chart-2: #475569;
-  --chart-3: #0F172A;
-  --chart-4: #34D399;
-  --chart-5: #94A3B8;
-  --radius: 0.625rem;
+  --chart-2: #FBBF24;
+  --chart-3: #0F0F0F;
+  --chart-4: #EF4444;
+  --chart-5: #606060;
+  --radius: 0.75rem;
 }
 
 .dark {
-  --background: #0F172A;
-  --foreground: #F8FAFC;
-  --card: #1E293B;
-  --card-foreground: #F8FAFC;
-  --popover: #1E293B;
-  --popover-foreground: #F8FAFC;
-  --primary: #F8FAFC;
-  --primary-foreground: #0F172A;
-  --secondary: #475569;
-  --secondary-foreground: #F8FAFC;
-  --muted: #1E293B;
-  --muted-foreground: #94A3B8;
+  --background: #0F0F0F;
+  --foreground: #F1F1F1;
+  --card: #0F0F0F;
+  --card-foreground: #F1F1F1;
+  --popover: #0F0F0F;
+  --popover-foreground: #F1F1F1;
+  --primary: #F1F1F1;
+  --primary-foreground: #0F0F0F;
+  --secondary: #AAAAAA;
+  --secondary-foreground: #0F0F0F;
+  --muted: #272727;
+  --muted-foreground: #AAAAAA;
   --accent: #10B981;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
-  --border: #334155;
-  --input: #334155;
-  --ring: #10B981;
+  --border: #272727;
+  --input: #272727;
+  --ring: #F1F1F1;
 }
 
 @layer base {
@@ -108,30 +108,24 @@
 }
 
 .bg-grid {
-  background-image:
-    linear-gradient(to right, var(--border) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at center, black 40%, transparent 95%);
+  background-image: none;
+  background-color: var(--background);
 }
 
 .dark .bg-grid {
-  background-image:
-    linear-gradient(to right, var(--border) 0.5px, transparent 0.5px),
-    linear-gradient(to bottom, var(--border) 0.5px, transparent 0.5px);
+  background-image: none;
+  background-color: var(--background);
 }
 
 /* Glassmorphism card utility */
 .glass-card {
-  background: rgba(var(--card-rgb, 255, 255, 255), 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--foreground-rgb, 15, 23, 42), 0.05);
+  background: var(--card);
+  border: 1px solid var(--border);
 }
 
 .dark .glass-card {
-  background: rgba(30, 41, 59, 0.45);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--card);
+  border: 1px solid var(--border);
 }
 
 /* Glow effects */
@@ -143,7 +137,7 @@
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.4) 0%, rgba(52, 211, 153, 0.1) 50%, rgba(16, 185, 129, 0.4) 100%);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.4) 0%, rgba(251, 191, 36, 0.2) 50%, rgba(16, 185, 129, 0.4) 100%);
   z-index: -1;
   opacity: 0.8;
   transition: opacity 0.3s ease;
@@ -155,8 +149,8 @@
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -167,6 +161,23 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground);
+}
+
+/* Shimmer effect for loading states */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    var(--background) 50%,
+    var(--muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 @keyframes fade-in-up {
@@ -189,4 +200,3 @@
 .animate-fade-in-up:nth-child(4) { animation-delay: 0.18s; }
 .animate-fade-in-up:nth-child(5) { animation-delay: 0.24s; }
 .animate-fade-in-up:nth-child(6) { animation-delay: 0.3s; }
-

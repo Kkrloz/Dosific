@@ -52,7 +52,7 @@ export function ComparisonBar({ data }: ComparisonBarProps) {
             tick={{ fontSize: 11, fill: "var(--muted-foreground)", fontWeight: 500 }}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(v) => `R$ ${v}`}
+            tickFormatter={(v: number) => `R$ ${v}`}
             dx={-4}
           />
           <Tooltip

@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createProduct } from "@/lib/actions";
-import { Plus, ChevronDown, ChevronUp, Gauge } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp, Gauge, Link, Search, ExternalLink } from "lucide-react";
 
 interface Category {
   id: string;
@@ -41,9 +41,50 @@ export function NewProductForm({ categories }: NewProductFormProps) {
   const [unit, setUnit] = useState("g");
   const [doseUnit, setDoseUnit] = useState("g");
   const [packageWeight, setPackageWeight] = useState("");
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [fetching, setFetching] = useState(false);
+  const [productUrl, setProductUrl] = useState("");
+  const [productName, setProductName] = useState("");
+  const [productPrice, setProductPrice] = useState("");
+  const [affiliateLink, setAffiliateLink] = useState("");
+
+  const selectedCategoryName = categoryId
+    ? categories.find((c) => c.id === categoryId)?.name
+    : "";
+
+  async function handleFetchProduct() {
+    if (!productUrl) return;
+    setFetching(true);
+    try {
+      const res = await fetch("/api/fetch-product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: productUrl }),
+      });
+      const data = await res.json();
+      if (data.name) setProductName(data.name);
+      if (data.price) setProductPrice(String(data.price));
+      if (!data.name && !data.price) {
+        toast.error("Não foi possível extrair os dados", {
+          description: "Preencha os campos manualmente",
+        });
+      } else {
+        toast.success("Dados encontrados!", {
+          description: `Produto: ${data.name || "sem nome"} · Preço: R$ ${data.price || "? "}`,
+        });
+      }
+    } catch {
+      toast.error("Erro ao buscar produto");
+    } finally {
+      setFetching(false);
+    }
+  }
 
   function handleCategoryChange(value: string | null) {
     setCategoryId(value ?? "");
+    setShowNewCategory(false);
+    setNewCategoryName("");
   }
   function handleUnitChange(value: string | null) {
     setUnit(value ?? "g");
@@ -68,11 +109,21 @@ export function NewProductForm({ categories }: NewProductFormProps) {
       setUnit("g");
       setDoseUnit("g");
       setPackageWeight("");
+      setShowNewCategory(false);
+      setNewCategoryName("");
+      setProductUrl("");
+      setProductName("");
+      setProductPrice("");
+      setAffiliateLink("");
       setOpen(false);
       toast.success("Produto adicionado", {
         description: "Produto cadastrado com sucesso",
       });
       router.refresh();
+    } else {
+      toast.error("Erro ao adicionar produto", {
+        description: Object.values(result.errors ?? {}).flat().join(", "),
+      });
     }
   }
 
@@ -102,6 +153,47 @@ export function NewProductForm({ categories }: NewProductFormProps) {
       {open && (
         <div className="border-t border-border/40 p-5 animate-fade-in-up bg-card/30">
           <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+            {/* URL Auto-Fetch Section */}
+            <div className="bg-gradient-to-r from-emerald-500/[0.03] to-teal-500/[0.01] border border-emerald-500/10 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                <Link className="size-3.5" />
+                Link do Produto
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    name="url"
+                    placeholder="https://www.amazon.com.br/..."
+                    value={productUrl}
+                    onChange={(e) => setProductUrl(e.target.value)}
+                    className="bg-background/50 text-sm"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  onClick={handleFetchProduct}
+                  disabled={fetching || !productUrl}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 cursor-pointer transition-all shrink-0 disabled:opacity-50"
+                >
+                  {fetching ? (
+                    <span className="flex items-center gap-1.5">
+                      <span className="size-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Buscando
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5">
+                      <Search className="size-3.5" />
+                      Buscar
+                    </span>
+                  )}
+                </Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground/70">
+                Cole o link do produto para preencher nome e preço automaticamente.
+                Lojas compatíveis: Amazon, Mercado Livre, Growth, Max Nutrition, Integral Médica.
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Coluna 1: Informações Gerais */}
               <div className="space-y-3.5">
@@ -109,7 +201,15 @@ export function NewProductForm({ categories }: NewProductFormProps) {
                 
                 <div className="space-y-1">
                   <Label htmlFor="name" className="text-xs font-medium text-muted-foreground">Nome do Produto</Label>
-                  <Input id="name" name="name" placeholder="Ex: Creatina Creapure" required className="bg-background/50" />
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Ex: Creatina Creapure"
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
+                    required
+                    className="bg-background/50"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -117,7 +217,7 @@ export function NewProductForm({ categories }: NewProductFormProps) {
                     <Label className="text-xs font-medium text-muted-foreground">Categoria</Label>
                     <Select value={categoryId} onValueChange={handleCategoryChange}>
                       <SelectTrigger className="bg-background/50">
-                        <SelectValue placeholder="Selecione" />
+                        <SelectValue placeholder="Selecione">{selectedCategoryName}</SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((cat) => (
@@ -128,11 +228,41 @@ export function NewProductForm({ categories }: NewProductFormProps) {
                       </SelectContent>
                     </Select>
                     <input type="hidden" name="categoryId" value={categoryId} />
+                    {showNewCategory ? (
+                      <div className="mt-2">
+                        <Input
+                          name="newCategory"
+                          placeholder="Digite o nome da nova categoria"
+                          value={newCategoryName}
+                          onChange={(e) => setNewCategoryName(e.target.value)}
+                          className="text-xs bg-background/50"
+                        />
+                        <input type="hidden" name="categoryId" value="" />
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setShowNewCategory(true)}
+                        className="text-xs text-emerald-500 hover:text-emerald-400 hover:underline mt-1.5 transition-colors"
+                      >
+                        + Nova Categoria
+                      </button>
+                    )}
                   </div>
 
                   <div className="space-y-1">
                     <Label htmlFor="price" className="text-xs font-medium text-muted-foreground">Preço (R$)</Label>
-                    <Input id="price" name="price" type="number" step="0.01" placeholder="89,90" required className="bg-background/50" />
+                    <Input
+                      id="price"
+                      name="price"
+                      type="number"
+                      step="0.01"
+                      placeholder="89,90"
+                      value={productPrice}
+                      onChange={(e) => setProductPrice(e.target.value)}
+                      required
+                      className="bg-background/50"
+                    />
                   </div>
                 </div>
               </div>
@@ -228,6 +358,9 @@ export function NewProductForm({ categories }: NewProductFormProps) {
                 Adicionar Produto
               </Button>
             </div>
+
+            {/* Link de Afiliado (oculto, usado internamente no dashboard) */}
+            <input type="hidden" name="affiliateLink" value={affiliateLink} />
           </form>
         </div>
       )}

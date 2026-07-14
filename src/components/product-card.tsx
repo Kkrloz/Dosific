@@ -1,21 +1,26 @@
+"use client";
+
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDoses } from "@/lib/utils";
-import { calculate } from "@/lib/calculator";
-import { Package, TrendingUp, Award, Sparkles } from "lucide-react";
+import { calculate, type Unit } from "@/lib/calculator";
+import { Package, TrendingUp, Award, Sparkles, ShoppingCart } from "lucide-react";
+import { ShareButton } from "./share-button";
 
 interface ProductCardProps {
   id: string;
   name: string;
   categoryName: string;
   packageWeight: number;
-  unit: string;
+  unit: Unit;
   doseSize: number;
-  doseUnit: string;
+  doseUnit: Unit;
   bonus: number | null;
   lastPrice: number | null;
   isBest?: boolean;
+  url?: string | null;
+  affiliateLink?: string | null;
 }
 
 export function ProductCard({
@@ -29,6 +34,8 @@ export function ProductCard({
   bonus,
   lastPrice,
   isBest,
+  url,
+  affiliateLink,
 }: ProductCardProps) {
   if (!lastPrice) {
     return (
@@ -54,64 +61,85 @@ export function ProductCard({
     );
   }
 
-  const calc = calculate(lastPrice, packageWeight, unit as any, doseSize, doseUnit as any, bonus ?? undefined);
+  const calc = calculate(lastPrice, packageWeight, unit, doseSize, doseUnit, bonus ?? undefined);
+  const buyLink = url;
 
   return (
-    <Link href={`/products/${id}`}>
-      <Card className={`p-5 border h-full flex flex-col group transition-all duration-300 hover:-translate-y-1 relative overflow-hidden ${
-        isBest 
-          ? "glow-best border-emerald-500/30 bg-emerald-500/[0.04] dark:bg-emerald-500/[0.02]" 
-          : "border-border/40 bg-card/65 backdrop-blur-sm hover:border-border/80 shadow-sm hover:shadow-md"
-      }`}>
-        {isBest && (
-          <div className="absolute top-0 right-0">
-            <div className="bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg flex items-center gap-1 shadow-sm uppercase tracking-wider">
-              <Award className="size-3" />
-              Melhor Custo
+    <div className="group relative">
+      <Link href={`/products/${id}`}>
+        <Card className={`p-5 border h-full flex flex-col group-hover:-translate-y-1 transition-all duration-300 relative overflow-hidden ${
+          isBest 
+            ? "glow-best border-emerald-500/30 bg-emerald-500/[0.04] dark:bg-emerald-500/[0.02]" 
+            : "border-border/40 bg-card/65 backdrop-blur-sm hover:border-border/80 shadow-sm hover:shadow-md"
+        }`}>
+          {isBest && (
+            <div className="absolute top-0 right-0">
+              <div className="bg-emerald-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg flex items-center gap-1 shadow-sm uppercase tracking-wider">
+                <Award className="size-3" />
+                Melhor Custo
+              </div>
+            </div>
+          )}
+          <div className="flex items-start gap-3 mb-4">
+            <div className={`size-10 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+              isBest ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-emerald-500/10 text-emerald-500 group-hover:bg-emerald-500/15"
+            }`}>
+              {isBest ? <Sparkles className="size-5" /> : <TrendingUp className="size-5" />}
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-bold text-primary truncate group-hover:text-emerald-500 transition-colors tracking-tight">{name}</h3>
+              <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mt-1.5 border ${
+                isBest 
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" 
+                  : "bg-muted/65 text-muted-foreground border-border/20"
+              }`}>
+                {categoryName}
+              </span>
             </div>
           </div>
-        )}
-        <div className="flex items-start gap-3 mb-4">
-          <div className={`size-10 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-            isBest ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-emerald-500/10 text-emerald-500 group-hover:bg-emerald-500/15"
-          }`}>
-            {isBest ? <Sparkles className="size-5" /> : <TrendingUp className="size-5" />}
-          </div>
-          <div className="min-w-0 pr-16">
-            <h3 className="font-bold text-primary truncate group-hover:text-emerald-500 transition-colors tracking-tight">{name}</h3>
-            <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mt-1.5 border ${
-              isBest 
-                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" 
-                : "bg-muted/65 text-muted-foreground border-border/20"
-            }`}>
-              {categoryName}
+          
+          <div className="flex items-baseline gap-1.5 mb-2.5">
+            <span className="text-3xl font-extrabold text-emerald-500 tracking-tight">
+              {formatCurrency(calc.costPerDose)}
             </span>
+            <span className="text-xs font-medium text-muted-foreground">/ dose</span>
           </div>
-        </div>
-        
-        <div className="flex items-baseline gap-1.5 mb-2.5">
-          <span className="text-3xl font-extrabold text-emerald-500 tracking-tight">
-            {formatCurrency(calc.costPerDose)}
-          </span>
-          <span className="text-xs font-medium text-muted-foreground">/ dose</span>
-        </div>
 
-        <div className="mt-auto pt-3 border-t border-border/20 space-y-1.5 text-xs text-muted-foreground/80">
-          <p className="flex items-center justify-between">
-            <span>Preço & Peso:</span>
-            <span className="font-semibold text-primary/80">
-              {formatCurrency(lastPrice)} · {packageWeight}{unit}
-              {bonus ? <span className="text-emerald-500 font-semibold"> (+{bonus}g)</span> : ""}
-            </span>
-          </p>
-          <p className="flex items-center justify-between">
-            <span>Rendimento:</span>
-            <span className="font-semibold text-primary/80">
-              {formatDoses(calc.totalDoses)} doses · {doseSize}{doseUnit} cada
-            </span>
-          </p>
-        </div>
-      </Card>
-    </Link>
+          <div className="mt-auto pt-3 border-t border-border/20 space-y-1.5 text-xs text-muted-foreground/80">
+            <p className="flex items-center justify-between">
+              <span>Preço & Peso:</span>
+              <span className="font-semibold text-primary/80">
+                {formatCurrency(lastPrice)} · {packageWeight}{unit}
+                {bonus ? <span className="text-emerald-500 font-semibold"> (+{bonus}g)</span> : ""}
+              </span>
+            </p>
+            <p className="flex items-center justify-between">
+              <span>Rendimento:</span>
+              <span className="font-semibold text-primary/80">
+                {formatDoses(calc.totalDoses)} doses · {doseSize}{doseUnit} cada
+              </span>
+            </p>
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-border/10 flex items-center justify-between">
+            <ShareButton productId={id} productName={name} />
+            {buyLink ? (
+              <a
+                href={`/api/click/${id}`}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-sm transition-all"
+              >
+                <ShoppingCart className="size-3.5" />
+                Comprar
+              </a>
+            ) : (
+              <span className="text-[10px] text-muted-foreground/60">Clique para detalhes</span>
+            )}
+          </div>
+        </Card>
+      </Link>
+    </div>
   );
 }

@@ -14,6 +14,7 @@ export default async function ProductPage({
     where: { id },
     include: {
       category: true,
+      user: { select: { name: true } },
       prices: { orderBy: { createdAt: "asc" } },
     },
   });
