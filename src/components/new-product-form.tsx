@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -52,6 +52,17 @@ export function NewProductForm({ categories }: NewProductFormProps) {
   const selectedCategoryName = categoryId
     ? categories.find((c) => c.id === categoryId)?.name
     : "";
+
+  useEffect(() => {
+    function onHashChange() {
+      if (window.location.hash === "#new-product") {
+        setOpen(true);
+      }
+    }
+    onHashChange();
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   async function handleFetchProduct() {
     if (!productUrl) return;

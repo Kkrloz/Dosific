@@ -31,7 +31,7 @@ export function MobileMenu() {
       {open && (
         <div className="fixed inset-0 z-[100]">
           <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <div className="fixed top-0 left-0 bottom-0 w-72 bg-card border-r border-border shadow-2xl">
+          <div className="fixed top-0 left-0 bottom-0 w-72 bg-muted border-r border-border shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-border/40">
               <span className="font-bold text-foreground">Dosific</span>
               <button
