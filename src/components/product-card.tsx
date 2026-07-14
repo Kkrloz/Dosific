@@ -62,7 +62,6 @@ export function ProductCard({
   }
 
   const calc = calculate(lastPrice, packageWeight, unit, doseSize, doseUnit, bonus ?? undefined);
-  const buyLink = url;
 
   return (
     <div className="group relative">
@@ -123,7 +122,7 @@ export function ProductCard({
 
           <div className="mt-3 pt-3 border-t border-border/10 flex items-center justify-between">
             <ShareButton productId={id} productName={name} />
-            {buyLink ? (
+            {url ? (
               <a
                 href={`/api/click/${id}`}
                 target="_blank"

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { Package, BarChart3, ExternalLink, Crown, ArrowUpRight } from "lucide-react"
+import { Package, BarChart3, ExternalLink, Crown } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 

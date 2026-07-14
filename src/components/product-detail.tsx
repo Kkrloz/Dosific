@@ -19,14 +19,12 @@ import {
   BarChart3,
   ArrowLeft,
   TrendingUp,
-  TrendingDown,
   Clock,
   ArrowUpRight,
   ArrowDownRight,
   Calendar,
   ExternalLink,
   ShoppingCart,
-  Share2,
 } from "lucide-react";
 
 
