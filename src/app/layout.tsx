@@ -28,6 +28,9 @@ export const metadata: Metadata = {
     shortcut: "/icone-removebg-preview.png",
     apple: "/icone-removebg-preview.png",
   },
+  other: {
+    "google-adsense-account": "ca-pub-5012986302679215",
+  },
 };
 
 export default async function RootLayout({
