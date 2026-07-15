@@ -102,7 +102,7 @@ export async function getOrCreateCustomer(user: { id: string; name: string | nul
   return customer.id
 }
 
-export function parseWebhookPayload(body: any) {
+export function parseWebhookPayload(body: Record<string, unknown>) {
   const event = body.event as string
   const payment = body.payment as {
     id: string

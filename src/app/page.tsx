@@ -5,7 +5,11 @@ import { ComparisonSection } from "@/components/comparison-section";
 import { calculate, type Unit } from "@/lib/calculator";
 import { formatCurrency } from "@/lib/utils";
 import Image from "next/image";
-import { Wallet, Award, TrendingUp, Layers, Sparkles, Search, X } from "lucide-react";
+import Link from "next/link";
+import { Wallet, Award, TrendingUp, Layers, Sparkles, Search, X, BarChart3 } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { shouldShowAds, ADSENSE_SLOTS } from "@/lib/adsense";
+import { AdBanner } from "@/components/ad-banner";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +20,7 @@ export default async function Home({
 }) {
   const { q } = await searchParams;
   const searchQuery = typeof q === "string" ? q : "";
+  const showAds = await shouldShowAds(await auth())
 
   const products = await prisma.product.findMany({
     where: {
@@ -95,20 +100,31 @@ export default async function Home({
             </div>
           </div>
           {withCalc.length > 0 && (
-            <div className="flex items-center gap-3 shrink-0 bg-background/60 backdrop-blur-sm border border-border/40 rounded-xl px-4 py-2.5">
-              <div className="flex -space-x-2">
-                {withCalc.slice(0, 4).map((p) => (
-                  <div key={p.id} className="size-7 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-background">
-                    {p.name.charAt(0).toUpperCase()}
-                  </div>
-                ))}
-                {withCalc.length > 4 && (
-                  <div className="size-7 rounded-full bg-muted text-[10px] font-bold text-muted-foreground flex items-center justify-center ring-2 ring-background">
-                    +{withCalc.length - 4}
-                  </div>
-                )}
+            <div className="flex items-center gap-2 shrink-0">
+              {withCalc.length > 1 && (
+          <Link
+            href="/#compare"
+            className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all"
+          >
+            <BarChart3 className="size-4" />
+            Comparar
+          </Link>
+              )}
+              <div className="flex items-center gap-3 bg-background/60 backdrop-blur-sm border border-border/40 rounded-xl px-4 py-2.5">
+                <div className="flex -space-x-2">
+                  {withCalc.slice(0, 4).map((p) => (
+                    <div key={p.id} className="size-7 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-background">
+                      {p.name.charAt(0).toUpperCase()}
+                    </div>
+                  ))}
+                  {withCalc.length > 4 && (
+                    <div className="size-7 rounded-full bg-muted text-[10px] font-bold text-muted-foreground flex items-center justify-center ring-2 ring-background">
+                      +{withCalc.length - 4}
+                    </div>
+                  )}
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">{withCalc.length} produtos</span>
               </div>
-              <span className="text-xs text-muted-foreground font-medium">{withCalc.length} produtos</span>
             </div>
           )}
         </div>
@@ -124,13 +140,13 @@ export default async function Home({
           <span className="text-xs text-muted-foreground/60 ml-auto">
             {products.length} {products.length === 1 ? "produto encontrado" : "produtos encontrados"}
           </span>
-          <a
+          <Link
             href="/"
             className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-emerald-500 bg-muted/50 hover:bg-emerald-500/10 px-2.5 py-1 rounded-full transition-all"
           >
             <X className="size-3" />
             Limpar
-          </a>
+          </Link>
         </div>
       )}
 
@@ -178,6 +194,8 @@ export default async function Home({
         </div>
       )}
 
+      <AdBanner slot={ADSENSE_SLOTS.betweenContent} format="horizontal" show={showAds} className="my-6" />
+
       <div id="new-product">
         <NewProductForm categories={categories} />
       </div>
@@ -190,35 +208,45 @@ export default async function Home({
             </p>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {products.map((p, i) => (
-              <div key={p.id} className="animate-fade-in-up" style={{ animationDelay: `${i * 0.04}s` }}>
-                <ProductCard
-                  id={p.id}
-                  name={p.name}
-                  categoryName={p.category.name}
-                  packageWeight={p.packageWeight}
-                  unit={p.unit as Unit}
-                  doseSize={p.doseSize}
-                  doseUnit={p.doseUnit as Unit}
-                  bonus={p.bonus}
-                  lastPrice={p.lastPrice}
-                  url={p.url}
-                  affiliateLink={p.affiliateLink}
-                  isBest={
-                    p.lastPrice !== null &&
-                    bestCostPerDose !== null &&
-                    calculate(
-                      p.lastPrice,
-                      p.packageWeight,
-                      p.unit as Unit,
-                      p.doseSize,
-                      p.doseUnit as Unit,
-                      p.bonus ?? undefined,
-                    ).costPerDose === bestCostPerDose
-                  }
-                />
-              </div>
-            ))}
+            {products.flatMap((p, i) => {
+              const items = [
+                <div key={p.id} className="animate-fade-in-up" style={{ animationDelay: `${i * 0.04}s` }}>
+                  <ProductCard
+                    id={p.id}
+                    name={p.name}
+                    categoryName={p.category.name}
+                    packageWeight={p.packageWeight}
+                    unit={p.unit as Unit}
+                    doseSize={p.doseSize}
+                    doseUnit={p.doseUnit as Unit}
+                    bonus={p.bonus}
+                    lastPrice={p.lastPrice}
+                    url={p.url}
+                    affiliateLink={p.affiliateLink}
+                    isBest={
+                      p.lastPrice !== null &&
+                      bestCostPerDose !== null &&
+                      calculate(
+                        p.lastPrice,
+                        p.packageWeight,
+                        p.unit as Unit,
+                        p.doseSize,
+                        p.doseUnit as Unit,
+                        p.bonus ?? undefined,
+                      ).costPerDose === bestCostPerDose
+                    }
+                  />
+                </div>,
+              ]
+              if ((i + 1) % 3 === 0 && showAds) {
+                items.push(
+                  <div key={`ad-${i}`} className="col-span-full">
+                    <AdBanner slot={ADSENSE_SLOTS.inFeed} format="horizontal" show={showAds} />
+                  </div>,
+                )
+              }
+              return items
+            })}
           </div>
 
           {withCalc.length > 1 && (
@@ -236,13 +264,13 @@ export default async function Home({
           <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
             Adicione seu primeiro produto para começar a calcular o custo por dose e descobrir onde economizar.
           </p>
-          <a
+          <Link
             href="/#new-product"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold px-5 py-2.5 rounded-full text-sm shadow-sm hover:shadow-md transition-all"
           >
             <Wallet className="size-4" />
             Adicionar Primeiro Produto
-          </a>
+          </Link>
         </div>
       )}
     </div>

@@ -37,7 +37,7 @@ export function PaymentForm({ plan, onClose }: PaymentFormProps) {
 
     const formData = new FormData(e.currentTarget)
 
-    const body: Record<string, any> = {
+    const body: Record<string, unknown> = {
       planId: plan.id,
       billingType,
     }

@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { PriceChart } from "@/components/price-chart";
 import { updatePrice } from "@/lib/actions";
+import Link from "next/link";
 import { ShareButton } from "./share-button";
-import { calculate } from "@/lib/calculator";
+import { calculate, type Unit } from "@/lib/calculator";
 import { formatCurrency, formatDoses } from "@/lib/utils";
 import {
   DollarSign,
@@ -73,9 +74,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
     ? calculate(
         product.lastPrice,
         product.packageWeight,
-        product.unit as any,
+        product.unit as Unit,
         product.doseSize,
-        product.doseUnit as any,
+        product.doseUnit as Unit,
         product.bonus ?? undefined,
       )
     : null;
@@ -127,13 +128,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
   return (
     <div className="space-y-6">
       <div>
-        <a
+        <Link
           href="/"
           className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-emerald-500 bg-card hover:bg-emerald-500/[0.02] border border-border/40 hover:border-emerald-500/20 px-3.5 py-2 rounded-full transition-all shadow-sm hover:shadow active:scale-95 cursor-pointer"
         >
           <ArrowLeft className="size-3.5" />
           Voltar para Início
-        </a>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">

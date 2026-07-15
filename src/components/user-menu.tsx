@@ -1,8 +1,10 @@
 "use client"
 
+import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
 import { signOut, useSession } from "next-auth/react"
-import { LogOut, LayoutDashboard, User, ChevronDown } from "lucide-react"
+import Image from "next/image"
+import { LogOut, LayoutDashboard, ChevronDown } from "lucide-react"
 
 export function UserMenu() {
   const { data: session } = useSession()
@@ -32,9 +34,11 @@ export function UserMenu() {
         className="flex items-center gap-1.5 p-1 rounded-full hover:bg-muted transition-colors cursor-pointer"
       >
         {session.user.image ? (
-          <img
+          <Image
             src={session.user.image}
             alt="Avatar"
+            width={28}
+            height={28}
             className="size-7 rounded-full object-cover"
           />
         ) : (
@@ -48,7 +52,7 @@ export function UserMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1.5 w-52 bg-card border border-border rounded-xl shadow-lg py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="absolute right-0 top-full mt-1.5 w-52 bg-popover dark:bg-zinc-900 border border-border dark:border-zinc-700 rounded-xl shadow-lg shadow-black/30 py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
           <div className="px-3 py-2 border-b border-border/40">
             <p className="text-sm font-semibold text-foreground truncate">
               {session.user.name ?? "Usuário"}
@@ -57,14 +61,14 @@ export function UserMenu() {
               {session.user.email}
             </p>
           </div>
-          <a
+          <Link
             href="/dashboard"
             onClick={() => setOpen(false)}
             className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <LayoutDashboard className="size-4" />
             Painel
-          </a>
+          </Link>
           <button
             onClick={() => {
               setOpen(false)

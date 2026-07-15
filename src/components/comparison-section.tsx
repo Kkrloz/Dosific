@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ComparisonBar } from "@/components/comparison-bar";
-import { calculate } from "@/lib/calculator";
+import { calculate, type Unit } from "@/lib/calculator";
 import { formatCurrency, formatDoses } from "@/lib/utils";
 import { BarChart3, Check, PiggyBank, Sparkles } from "lucide-react";
 
@@ -34,25 +34,21 @@ export function ComparisonSection({ products }: { products: ProductItem[] }) {
   }
 
   const selectedProducts = validProducts.filter((p) => selected.has(p.id));
-  const chartData = useMemo(
-    () =>
-      selectedProducts.map((p) => {
-        const calc = calculate(
-          p.lastPrice!,
-          p.packageWeight,
-          p.unit as any,
-          p.doseSize,
-          p.doseUnit as any,
-          p.bonus ?? undefined,
-        );
-        return {
-          name: p.name,
-          costPerDose: calc.costPerDose,
-          doses: calc.totalDoses,
-        };
-      }),
-    [selectedProducts],
-  );
+  const chartData = selectedProducts.map((p) => {
+    const calc = calculate(
+      p.lastPrice!,
+      p.packageWeight,
+      p.unit as Unit,
+      p.doseSize,
+      p.doseUnit as Unit,
+      p.bonus ?? undefined,
+    );
+    return {
+      name: p.name,
+      costPerDose: calc.costPerDose,
+      doses: calc.totalDoses,
+    };
+  });
 
   const best = chartData.length > 0
     ? chartData.reduce((min, curr) => (curr.costPerDose < min.costPerDose ? curr : min))

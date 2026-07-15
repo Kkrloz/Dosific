@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDoses } from "@/lib/utils";
 import { calculate, type Unit } from "@/lib/calculator";
 import { Package, TrendingUp, Award, Sparkles, ShoppingCart } from "lucide-react";
@@ -35,7 +34,6 @@ export function ProductCard({
   lastPrice,
   isBest,
   url,
-  affiliateLink,
 }: ProductCardProps) {
   if (!lastPrice) {
     return (

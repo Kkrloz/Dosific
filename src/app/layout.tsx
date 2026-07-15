@@ -3,11 +3,16 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
+import Link from "next/link";
+import Script from "next/script";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SessionProvider } from "@/components/session-provider";
 import { HeaderAuth } from "@/components/header-auth";
 import { MobileMenu } from "@/components/mobile-menu";
 import { Search, Plus, Home, BarChart3 } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { shouldShowAds, ADSENSE_PUBLISHER_ID, ADSENSE_ENABLED, ADSENSE_SLOTS } from "@/lib/adsense";
+import { AdBanner } from "@/components/ad-banner";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,11 +30,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth()
+  const showAds = await shouldShowAds(session)
   return (
     <html
       lang="pt-BR"
@@ -45,7 +52,7 @@ export default function RootLayout({
                 {/* Left: Brand logo & Menu */}
                 <div className="flex items-center gap-3 shrink-0">
                   <MobileMenu />
-                  <a href="/" className="flex items-center gap-2.5 active:scale-95 transition-transform">
+                  <Link href="/" className="flex items-center gap-2.5 active:scale-95 transition-transform">
                     <Image
                       src="/icone-removebg-preview.png"
                       alt="Dosific"
@@ -53,7 +60,7 @@ export default function RootLayout({
                       height={28}
                       className="object-contain"
                     />
-                  </a>
+                  </Link>
                 </div>
 
                 {/* Center: Search Bar (YouTube style) */}
@@ -77,10 +84,10 @@ export default function RootLayout({
 
                 {/* Right: Actions & Profile */}
                 <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                  <a href="/#new-product" className="flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all">
+                  <Link href="/#new-product" className="flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all">
                     <Plus className="size-4" />
                     <span className="hidden sm:inline">Criar</span>
-                  </a>
+                  </Link>
                   <HeaderAuth />
                   <ThemeToggle />
                 </div>
@@ -91,22 +98,23 @@ export default function RootLayout({
               {/* Left Sidebar */}
               <aside className="w-60 shrink-0 hidden lg:flex flex-col border-r border-border/40 bg-background py-4 px-3 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto">
                 <div className="space-y-1">
-                  <a href="/" className="flex items-center gap-4 px-4 py-2 rounded-xl bg-muted/60 text-primary font-semibold text-sm transition-all hover:bg-muted">
+                  <Link href="/" className="flex items-center gap-4 px-4 py-2 rounded-xl bg-muted/60 text-primary font-semibold text-sm transition-all hover:bg-muted">
                     <Home className="size-5 text-emerald-500" />
                     <span>Início</span>
-                  </a>
-                  <a href="/#compare" className="flex items-center gap-4 px-4 py-2 rounded-xl text-muted-foreground font-medium text-sm transition-all hover:bg-muted hover:text-primary">
+                  </Link>
+                  <Link href="/#compare" className="flex items-center gap-4 px-4 py-2 rounded-xl text-muted-foreground font-medium text-sm transition-all hover:bg-muted hover:text-primary">
                     <BarChart3 className="size-5 text-muted-foreground" />
                     <span>Comparar</span>
-                  </a>
-                  <a href="/#new-product" className="flex items-center gap-4 px-4 py-2 rounded-xl text-muted-foreground font-medium text-sm transition-all hover:bg-muted hover:text-primary">
+                  </Link>
+                  <Link href="/#new-product" className="flex items-center gap-4 px-4 py-2 rounded-xl text-muted-foreground font-medium text-sm transition-all hover:bg-muted hover:text-primary">
                     <Plus className="size-5 text-muted-foreground" />
                     <span>Adicionar</span>
-                  </a>
+                  </Link>
                 </div>
                 <div className="border-t border-border/40 my-4 pt-4 px-4">
                   <p className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider">Dosific</p>
                   <p className="text-xs text-muted-foreground mt-2 leading-relaxed">Calcule o custo-benefício de suplementos e produtos por dose.</p>
+                  <AdBanner slot={ADSENSE_SLOTS.sidebar} format="rectangle" show={showAds} className="mt-4" />
                 </div>
               </aside>
 
@@ -131,6 +139,14 @@ export default function RootLayout({
               },
             }}
           />
+          {showAds && ADSENSE_ENABLED && ADSENSE_PUBLISHER_ID && (
+            <Script
+              async
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
+              crossOrigin="anonymous"
+              strategy="afterInteractive"
+            />
+          )}
         </ThemeProvider>
       </body>
     </html>

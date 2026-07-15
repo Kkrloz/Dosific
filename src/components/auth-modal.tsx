@@ -78,7 +78,7 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative bg-popover dark:bg-zinc-900 border border-border dark:border-zinc-700 rounded-2xl shadow-2xl shadow-black/30 w-full max-w-md mx-4 p-6 animate-in fade-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-muted transition-colors cursor-pointer text-muted-foreground"
@@ -91,7 +91,7 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
             onClick={() => setTab("login")}
             className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all cursor-pointer ${
               tab === "login"
-                ? "bg-card text-foreground shadow-sm"
+                ? "bg-background dark:bg-zinc-800 text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -101,7 +101,7 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
             onClick={() => setTab("register")}
             className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all cursor-pointer ${
               tab === "register"
-                ? "bg-card text-foreground shadow-sm"
+                ? "bg-background dark:bg-zinc-800 text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -143,13 +143,17 @@ export function AuthModal({ open, onClose }: AuthModalProps) {
                 <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-card px-2 text-muted-foreground">ou</span>
+                <span className="bg-popover dark:bg-zinc-900 px-2 text-muted-foreground">ou</span>
               </div>
             </div>
             <Button
               type="button"
               variant="outline"
-              onClick={() => signIn("google", { redirect: false })}
+              onClick={() => {
+                setLoading(true)
+                signIn("google", { callbackUrl: window.location.href })
+              }}
+              disabled={loading}
               className="w-full h-9 font-semibold"
             >
               <svg className="size-4" viewBox="0 0 24 24" fill="none">

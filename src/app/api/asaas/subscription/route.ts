@@ -98,6 +98,29 @@ export async function POST(request: Request) {
   })
 }
 
+export async function GET() {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
+
+  const sub = await prisma.subscription.findUnique({
+    where: { userId: session.user.id },
+    include: { plan: true },
+  })
+
+  if (!sub) {
+    return NextResponse.json(null)
+  }
+
+  return NextResponse.json({
+    plan: sub.plan ? { name: sub.plan.name, slug: sub.plan.slug, price: sub.plan.price } : null,
+    status: sub.status,
+    billingType: sub.billingType,
+    currentPeriodEnd: sub.currentPeriodEnd?.toISOString() ?? null,
+  })
+}
+
 export async function DELETE() {
   const session = await auth()
   if (!session?.user?.id) {

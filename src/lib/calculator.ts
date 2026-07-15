@@ -1,10 +1,8 @@
-const weightUnits = ["g", "kg"] as const;
-const volumeUnits = ["ml", "L"] as const;
-export type WeightUnit = (typeof weightUnits)[number];
-export type VolumeUnit = (typeof volumeUnits)[number];
+export type WeightUnit = "g" | "kg";
+export type VolumeUnit = "ml" | "L";
 export type Unit = WeightUnit | VolumeUnit;
 
-function normalizeToBase(value: number, unit: Unit): number {
+export function normalizeToBase(value: number, unit: Unit): number {
   if (unit === "kg") return value * 1000;
   if (unit === "L") return value * 1000;
   return value;

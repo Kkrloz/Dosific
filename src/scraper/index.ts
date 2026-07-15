@@ -80,14 +80,35 @@ async function scrapeWithPuppeteer(url: string): Promise<number | null> {
   }
 }
 
+const ALLOWED_DOMAINS = [
+  "growthsupplements.com.br",
+  "maxnutrition.com.br",
+  "integralmedica.com.br",
+  "mercadolivre.com.br",
+  "amazon.com.br",
+]
+
+function isAllowedUrl(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname.replace("www.", "")
+    return ALLOWED_DOMAINS.some((d) => hostname.includes(d))
+  } catch {
+    return false
+  }
+}
+
 export async function scrapeProduct(url: string): Promise<ScrapeResult> {
+  if (!isAllowedUrl(url)) {
+    return { price: null, method: null, error: "Domain not allowed" }
+  }
   let price = await scrapeWithCheerio(url);
   if (price !== null) return { price, method: "cheerio" };
 
   price = await scrapeWithPuppeteer(url);
   if (price !== null) return { price, method: "puppeteer" };
 
-  return { price: null, method: null, error: "Could not extract price" };
+  const domain = isAllowedUrl(url) ? new URL(url).hostname.replace("www.", "") : url
+  return { price: null, method: null, error: `Não foi possível extrair o preço de ${domain}. O layout da loja pode ter mudado.` };
 }
 
 async function fetchWithCheerioFull(url: string): Promise<{ name: string | null; price: number | null }> {
@@ -128,10 +149,14 @@ async function fetchWithCheerioFull(url: string): Promise<{ name: string | null;
 }
 
 export async function scrapeProductInfo(url: string): Promise<ProductInfoResult> {
+  if (!isAllowedUrl(url)) {
+    return { name: null, price: null, error: "Domain not allowed" }
+  }
   const result = await fetchWithCheerioFull(url);
   if (result.name || result.price) {
     return { name: result.name, price: result.price };
   }
 
-  return { name: null, price: null, error: "Could not extract product info" };
+  const domain = isAllowedUrl(url) ? new URL(url).hostname.replace("www.", "") : url
+  return { name: null, price: null, error: `Não foi possível extrair dados de ${domain}. Tente preencher manualmente.` };
 }

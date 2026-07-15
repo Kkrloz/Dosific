@@ -1,12 +1,25 @@
 import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
+import { rateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for") ?? "unknown"
+  if (!rateLimit(`register:${ip}`, 5, 60000)) {
+    return NextResponse.json({ error: "Muitas tentativas. Tente novamente em 1 minuto." }, { status: 429 })
+  }
   const { name, email, password } = await request.json()
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email e senha obrigatórios" }, { status: 400 })
+  }
+
+  if (typeof password !== "string" || password.length < 8) {
+    return NextResponse.json({ error: "Senha deve ter no mínimo 8 caracteres" }, { status: 400 })
+  }
+
+  if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "Email inválido" }, { status: 400 })
   }
 
   const existing = await prisma.user.findUnique({ where: { email } })

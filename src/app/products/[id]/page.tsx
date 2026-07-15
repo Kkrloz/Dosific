@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ProductDetail } from "@/components/product-detail";
+import { auth } from "@/lib/auth";
+import { shouldShowAds, ADSENSE_SLOTS } from "@/lib/adsense";
+import { AdBanner } from "@/components/ad-banner";
 
 export const dynamic = "force-dynamic";
 
@@ -21,5 +24,12 @@ export default async function ProductPage({
 
   if (!product) notFound();
 
-  return <ProductDetail product={product} />;
+  const showAds = await shouldShowAds(await auth())
+
+  return (
+    <>
+      <AdBanner slot={ADSENSE_SLOTS.productDetail} format="horizontal" show={showAds} className="mb-6" />
+      <ProductDetail product={product} />
+    </>
+  );
 }

@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { scrapeProductInfo } from "@/scraper";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") ?? "unknown"
+  if (!rateLimit(`fetch:${ip}`, 10, 60000)) {
+    return NextResponse.json({ error: "Muitas requisições. Tente novamente em 1 minuto." }, { status: 429 })
+  }
   const body = await request.json();
   const { url } = body;
 

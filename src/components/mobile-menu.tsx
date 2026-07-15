@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { Home, BarChart3, Plus, LogIn, LayoutDashboard, X, Menu } from "lucide-react"
 import { AuthModal } from "./auth-modal"
@@ -43,30 +44,30 @@ export function MobileMenu() {
             </div>
 
             <div className="p-3 space-y-1">
-              <a
+              <Link
                 href="/"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-foreground bg-muted/60 transition-colors"
               >
                 <Home className="size-5 text-emerald-500" />
                 Início
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/#compare"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 <BarChart3 className="size-5 text-muted-foreground" />
                 Comparar
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/#new-product"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 <Plus className="size-5 text-muted-foreground" />
                 Adicionar
-              </a>
+              </Link>
             </div>
 
             <div className="border-t border-border/40 mx-3" />
@@ -74,23 +75,23 @@ export function MobileMenu() {
             <div className="p-3 space-y-1">
               {session?.user ? (
                 <>
-                  <a
+                  <Link
                     href="/dashboard"
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                   >
                     <LayoutDashboard className="size-5 text-muted-foreground" />
                     Painel
-                  </a>
+                  </Link>
                   {session.user.role === "ADMIN" && (
-                    <a
+                    <Link
                       href="/admin"
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     >
                       <LayoutDashboard className="size-5 text-muted-foreground" />
                       Admin
-                    </a>
+                    </Link>
                   )}
                 </>
               ) : (

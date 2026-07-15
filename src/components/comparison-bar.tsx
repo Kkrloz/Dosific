@@ -72,8 +72,9 @@ export function ComparisonBar({ data }: ComparisonBarProps) {
           <Bar
             dataKey="costPerDose"
             barSize={32}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             shape={(props: any) => {
-              const { x, y, width, height } = props;
+              const { x, y, width, height } = props
               const isBest = props.payload.costPerDose === minCost;
               return (
                 <rect

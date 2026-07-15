@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createProduct } from "@/lib/actions";
-import { Plus, ChevronDown, ChevronUp, Gauge, Link, Search, ExternalLink } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp, Gauge, Link, Search, Wallet } from "lucide-react";
 
 interface Category {
   id: string;
@@ -35,6 +36,7 @@ const weightPresets = [
 
 export function NewProductForm({ categories }: NewProductFormProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const formRef = useRef<HTMLFormElement>(null);
   const [open, setOpen] = useState(false);
   const [categoryId, setCategoryId] = useState("");
@@ -77,7 +79,7 @@ export function NewProductForm({ categories }: NewProductFormProps) {
       if (data.name) setProductName(data.name);
       if (data.price) setProductPrice(String(data.price));
       if (!data.name && !data.price) {
-        toast.error("Não foi possível extrair os dados", {
+        toast.error(data.error || "Não foi possível extrair os dados", {
           description: "Preencha os campos manualmente",
         });
       } else {
@@ -370,7 +372,22 @@ export function NewProductForm({ categories }: NewProductFormProps) {
               </Button>
             </div>
 
-            {/* Link de Afiliado (oculto, usado internamente no dashboard) */}
+            {session?.user && (
+              <div className="space-y-1">
+                <Label htmlFor="affiliateLink" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Wallet className="size-3.5 text-emerald-500" />
+                  Link de Afiliado
+                </Label>
+                <Input
+                  id="affiliateLink"
+                  name="affiliateLink"
+                  placeholder="https://..."
+                  value={affiliateLink}
+                  onChange={(e) => setAffiliateLink(e.target.value)}
+                  className="bg-background/50 text-sm"
+                />
+              </div>
+            )}
             <input type="hidden" name="affiliateLink" value={affiliateLink} />
           </form>
         </div>
