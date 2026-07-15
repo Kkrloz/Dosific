@@ -1,0 +1,3 @@
+# Ads.txt file for Dosific
+# Google AdSense
+google.com, ca-pub-5012986302679215, DIRECT, f08c47fec0942fa0
