@@ -139,7 +139,7 @@ export default async function RootLayout({
               },
             }}
           />
-          {showAds && ADSENSE_ENABLED && ADSENSE_PUBLISHER_ID && (
+          {ADSENSE_PUBLISHER_ID && (
             <Script
               async
               src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
